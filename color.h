@@ -2,8 +2,9 @@
 #define COLOR_H
 
 typedef enum color {
-    BLACK,
-    WHITE   
+    COLOR_BLACK,
+    COLOR_WHITE,
+    COLOR_NONE
 } color;
 
 #endif

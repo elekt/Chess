@@ -3,11 +3,13 @@
 #define PIECE_TYPE_H
 
 typedef enum piece_type {
+    KING,
     QUEEN,
     ROOK,
     BISHOP,
     KNIGHT,
-    PAWN
+    PAWN,
+    NONE
 } piece_type;
 
 #endif
