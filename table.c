@@ -1,4 +1,5 @@
 #include "table.h"
+#include "error_type.h"
 #include "piece.h"
 #include <stdlib.h>
 
@@ -57,3 +58,14 @@ table* init_table() {
 
     return table;
 };
+
+
+table*  move(table* table, int x1, int y1, int x2, int y2) {
+    piece current_piece = table->blocks[x1][y1];
+
+    if(current_piece.COLOR == COLOR_NONE) {
+        exit(ERROR_INVALID_STEP);
+    } 
+
+    return table;
+}
