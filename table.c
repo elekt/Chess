@@ -1,7 +1,9 @@
 #include "table.h"
 #include "error_type.h"
 #include "piece.h"
+#include "piece_type.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 table* init_table() {
     int i, j;
@@ -47,7 +49,7 @@ table* init_table() {
                 pieces[i][j].PIECE_TYPE = PAWN;
             } else {
                 pieces[i][j].COLOR = COLOR_NONE;
-                pieces[i][j].PIECE_TYPE = NONE;
+                pieces[i][j].PIECE_TYPE = TYPE_NONE;
             }
         }
     }
@@ -59,13 +61,23 @@ table* init_table() {
     return table;
 };
 
+bool is_valid_move(table* table, int x1, int y1, int x2, int y2) {
+    return true;
+}
 
-table*  move(table* table, int x1, int y1, int x2, int y2) {
+table* move(table* table, int x1, int y1, int x2, int y2) {
     piece current_piece = table->blocks[x1][y1];
 
     if(current_piece.COLOR == COLOR_NONE) {
         exit(ERROR_INVALID_STEP);
     } 
+
+
+    if(is_valid_move(table, x1, y1, x2, y2)) {
+        table->blocks[x2][y1] = table->blocks[x1][y1];
+        table->blocks[x1][y1].COLOR = COLOR_NONE;
+        table->blocks[x1][y1].PIECE_TYPE = TYPE_NONE;
+    }
 
     return table;
 }

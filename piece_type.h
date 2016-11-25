@@ -9,7 +9,7 @@ typedef enum piece_type {
     BISHOP,
     KNIGHT,
     PAWN,
-    NONE
+    TYPE_NONE
 } piece_type;
 
 #endif
