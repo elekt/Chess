@@ -4,6 +4,7 @@
 #include "piece_type.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 table* init_table() {
     int i, j;
@@ -61,8 +62,39 @@ table* init_table() {
     return table;
 };
 
+
+
 bool is_valid_move(table* table, int x1, int y1, int x2, int y2) {
-    return true;
+    if(x1 < 0 || x1 > 7 || y1 < 0 || y1 > 7 || x2 < 0 || x2 > 7 || y2 < 0 || y2 > 7) {
+        exit(ERROR_OUT_OF_TABLE);
+    }
+
+    if(x1 == x2 && y1 == y2){
+        return false;
+    }
+
+    // TODO check if sb is in the way
+    switch(table->blocks[x1][y1].PIECE_TYPE) {
+	    case KING:
+            // TODO check if wont be in hit
+            return((abs(x1-x2) == 0 || abs(x1-x2) == 0) && (abs(y1-y2) == 0 || abs(y1-y2) == 1));
+        case QUEEN:
+            return abs(x1-x2) == abs(y1-y2) || abs(x1-x2) == 0 || abs(y1-y2) == 0;
+        case ROOK:
+            return abs(x1-x2) == 0 || abs(y1-y2) == 0;
+        case BISHOP:
+             return abs(x1-x2) == abs(y1-y2); 
+            break;
+        case KNIGHT:
+            return (abs(x1-x2) == 2 && abs(y1-y2) == 1) || (abs(x1-x2) == 1 && abs(y1-y2) == 2);
+        case PAWN:
+            return (abs(x1-x2) == 1 && table->blocks[x2][y2].PIECE_TYPE == TYPE_NONE) || (abs(x1-x2) == abs(y1-y2) == 1 && table->blocks[x2][y2].PIECE_TYPE != TYPE_NONE);            
+        case TYPE_NONE:
+            exit(ERROR_INVALID_PIECE_TYPE);
+            break;
+    }
+
+    return false;
 }
 
 table* move(table* table, int x1, int y1, int x2, int y2) {
