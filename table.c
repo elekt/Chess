@@ -2,8 +2,11 @@
 #include "error_type.h"
 #include "piece.h"
 #include "piece_type.h"
+#include "coordinate.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
+#include <stdio.h>
 
 table* init_table() {
     int i, j;
@@ -56,28 +59,90 @@ table* init_table() {
     
 
     table* table = malloc(sizeof(table));
+    table->LAST_COLOR = COLOR_NONE;
     table->blocks = pieces;
 
     return table;
 };
 
-bool is_valid_move(table* table, int x1, int y1, int x2, int y2) {
+bool is_empty_way(table* table, coordinate coord_way, coordinate coord_start, coordinate coord_final) {
+    if(!((coord_way.x == 0 || (coord_start.x - coord_final.x) % coord_way.x == 0) && (coord_way.y == 0 || (coord_start.y - coord_final.y) % coord_way.y == 0))){
+        exit(ERROR_INVALID_STEP);
+    }
+
+    coordinate coord_temp;
+    coord_temp.x = coord_start.x;
+    coord_temp.y = coord_start.y;
+    bool is_arrived = false;
+    while(!is_arrived) {
+        coord_temp.x += coord_way.x;
+        coord_temp.y += coord_way.y;
+        if(coord_temp.x == coord_final.x && coord_temp.y == coord_final.y) {
+            return true;
+        }
+        if(table->blocks[coord_temp.x][coord_temp.y].PIECE_TYPE != TYPE_NONE) {
+            return false;
+        }
+    }
+
     return true;
 }
 
-table* move(table* table, int x1, int y1, int x2, int y2) {
-    piece current_piece = table->blocks[x1][y1];
+bool is_valid_move(table* table, coordinate coord_start, coordinate coord_final) {
+    if(coord_start.x < 0 || coord_start.x > 7 || coord_start.y < 0 || coord_start.y > 7 || coord_final.x < 0 || coord_final.x > 7 || coord_final.y < 0 || coord_final.y > 7) {
+        exit(ERROR_OUT_OF_TABLE);
+    }
+
+    if(coord_start.x == coord_final.x && coord_start.y == coord_final.y){
+        return false;
+    }
+
+    coordinate coord_way;
+    int delta_x = coord_final.x - coord_start.x;
+    coord_way.x = delta_x == 0 ? 0 : 1;
+    int delta_y = coord_final.y - coord_start.y;
+    coord_way.y = delta_y == 0 ? 0 : 1;
+    if(!is_empty_way(table, coord_way, coord_start, coord_final)) {
+        return false;
+    }   
+    switch(table->blocks[coord_start.x][coord_start.y].PIECE_TYPE) {
+	    case KING:
+            // TODO check if wont be in hit
+            return((abs(coord_start.x-coord_final.x) == 0 || abs(coord_start.x-coord_final.x) == 0) && (abs(coord_start.y-coord_final.y) == 0 || abs(coord_start.y-coord_final.y) == 1));
+        case QUEEN:
+            return abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y) || abs(coord_start.x-coord_final.x) == 0 || abs(coord_start.y-coord_final.y) == 0;
+        case ROOK:
+            return abs(coord_start.x-coord_final.x) == 0 || abs(coord_start.y-coord_final.y) == 0;
+        case BISHOP:
+             return abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y); 
+            break;
+        case KNIGHT:
+            return (abs(coord_start.x-coord_final.x) == 2 && abs(coord_start.y-coord_final.y) == 1) || (abs(coord_start.x-coord_final.x) == 1 && abs(coord_start.y-coord_final.y) == 2);
+        case PAWN:
+            return (abs(coord_start.x-coord_final.x) == 1 && abs(coord_start.y-coord_final.y) == 0 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE == TYPE_NONE) || (abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y) == 1 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE != TYPE_NONE);            
+        case TYPE_NONE:
+            exit(ERROR_INVALID_PIECE_TYPE);
+            break;
+    }
+
+    return false;
+}
+
+table* move(table* table, coordinate coord_start, coordinate coord_final) {
+    piece current_piece = table->blocks[coord_start.x][coord_start.y];
 
     if(current_piece.COLOR == COLOR_NONE) {
         exit(ERROR_INVALID_STEP);
     } 
 
 
-    if(is_valid_move(table, x1, y1, x2, y2)) {
-        table->blocks[x2][y1] = table->blocks[x1][y1];
-        table->blocks[x1][y1].COLOR = COLOR_NONE;
-        table->blocks[x1][y1].PIECE_TYPE = TYPE_NONE;
+    if(is_valid_move(table, coord_start, coord_final)) {
+        table->blocks[coord_final.x][coord_start.y] = table->blocks[coord_start.x][coord_start.y];
+        table->blocks[coord_start.x][coord_start.y].COLOR = COLOR_NONE;
+        table->blocks[coord_start.x][coord_start.y].PIECE_TYPE = TYPE_NONE;
     }
 
     return table;
 }
+
+
