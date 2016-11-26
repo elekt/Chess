@@ -119,7 +119,7 @@ bool is_valid_move(table* table, coordinate coord_start, coordinate coord_final)
         case KNIGHT:
             return (abs(coord_start.x-coord_final.x) == 2 && abs(coord_start.y-coord_final.y) == 1) || (abs(coord_start.x-coord_final.x) == 1 && abs(coord_start.y-coord_final.y) == 2);
         case PAWN:
-            return (abs(coord_start.x-coord_final.x) == 1 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE == TYPE_NONE) || (abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y) == 1 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE != TYPE_NONE);            
+            return (abs(coord_start.x-coord_final.x) == 1 && abs(coord_start.y-coord_final.y) == 0 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE == TYPE_NONE) || (abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y) == 1 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE != TYPE_NONE);            
         case TYPE_NONE:
             exit(ERROR_INVALID_PIECE_TYPE);
             break;
