@@ -64,7 +64,26 @@ table* init_table() {
     return table;
 };
 
-bool is_empty_way(coordinate coord_way, coordinate coord_start, coordinate coord_final) {
+bool is_empty_way(table* table, coordinate coord_way, coordinate coord_start, coordinate coord_final) {
+    if(!((coord_start.x - coord_final.x) % coord_way.x == 0 && (coord_start.y - coord_final.y) % coord_way.y == 0)){
+        exit(ERROR_INVALID_STEP);
+    }
+
+    coordinate coord_temp;
+    coord_temp.x = coord_start.x;
+    coord_temp.y = coord_start.y;
+    bool is_arrived = false;
+    while(!is_arrived) {
+        coord_temp.x += coord_way.x;
+        coord_temp.y += coord_way.y;
+        if(coord_temp.x == coord_final.x && coord_temp.y == coord_final.y) {
+            return true;
+        }
+        if(table->blocks[coord_temp.x][coord_temp.y].PIECE_TYPE != TYPE_NONE) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -77,7 +96,14 @@ bool is_valid_move(table* table, coordinate coord_start, coordinate coord_final)
         return false;
     }
 
-    // TODO check if sb is in the way
+    coordinate coord_way;
+    int delta_x = coord_final.x - coord_start.x;
+    coord_way.x = delta_x == 0 ? 0 : 1;
+    int delta_y = coord_final.y - coord_start.y;
+    coord_way.y = delta_y == 0 ? 0 : 1;
+    if(!is_empty_way(table, coord_way, coord_start, coord_final)) {
+        return false;
+    }   
     switch(table->blocks[coord_start.x][coord_start.y].PIECE_TYPE) {
 	    case KING:
             // TODO check if wont be in hit
