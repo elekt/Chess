@@ -7,6 +7,20 @@
 #include <SDL_gfxPrimitives.h>
 #include <math.h>
 
+void print_table(table* table) {
+   int i, j;
+       for(i = 0; i < 8; ++i) { 
+           for(j = 0; j < 8; ++j) {
+               if(table->blocks[i][j].COLOR == COLOR_NONE){
+                   printf("x ");
+               } else {
+                   printf("%d ", table->blocks[i][j].PIECE_TYPE); 
+               }
+           }
+       printf("\n");
+   }
+}
+
 int main(int argc, char *argv[]) {
     SDL_Event ev;
     SDL_Surface *screen;
@@ -20,7 +34,14 @@ int main(int argc, char *argv[]) {
     SDL_WM_SetCaption("SDL peldaprogram", "SDL peldaprogram");
 
 
-    //table* table = init_table();
+    table* table = init_table();
+
+    print_table(table);
+    printf("\n");
+    coordinate start = { 1, 1 };
+    coordinate final = { 2, 1 };
+    move(table, start, final);
+    print_table(table);
 
     int i, j;
     for(i = 0; i < 8; ++i) {
@@ -44,3 +65,5 @@ int main(int argc, char *argv[]) {
     SDL_Quit();
     return 0;
 }
+
+

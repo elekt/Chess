@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <stdio.h>
 
 table* init_table() {
     int i, j;
@@ -65,7 +66,7 @@ table* init_table() {
 };
 
 bool is_empty_way(table* table, coordinate coord_way, coordinate coord_start, coordinate coord_final) {
-    if(!((coord_start.x - coord_final.x) % coord_way.x == 0 && (coord_start.y - coord_final.y) % coord_way.y == 0)){
+    if(!((coord_way.x == 0 || (coord_start.x - coord_final.x) % coord_way.x == 0) && (coord_way.y == 0 || (coord_start.y - coord_final.y) % coord_way.y == 0))){
         exit(ERROR_INVALID_STEP);
     }
 
