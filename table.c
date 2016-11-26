@@ -2,6 +2,7 @@
 #include "error_type.h"
 #include "piece.h"
 #include "piece_type.h"
+#include "coordinate.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
@@ -57,38 +58,41 @@ table* init_table() {
     
 
     table* table = malloc(sizeof(table));
+    table->LAST_COLOR = COLOR_NONE;
     table->blocks = pieces;
 
     return table;
 };
 
+bool is_empty_way(coordinate coord_way, coordinate coord_start, coordinate coord_final) {
+    return true;
+}
 
-
-bool is_valid_move(table* table, int x1, int y1, int x2, int y2) {
-    if(x1 < 0 || x1 > 7 || y1 < 0 || y1 > 7 || x2 < 0 || x2 > 7 || y2 < 0 || y2 > 7) {
+bool is_valid_move(table* table, coordinate coord_start, coordinate coord_final) {
+    if(coord_start.x < 0 || coord_start.x > 7 || coord_start.y < 0 || coord_start.y > 7 || coord_final.x < 0 || coord_final.x > 7 || coord_final.y < 0 || coord_final.y > 7) {
         exit(ERROR_OUT_OF_TABLE);
     }
 
-    if(x1 == x2 && y1 == y2){
+    if(coord_start.x == coord_final.x && coord_start.y == coord_final.y){
         return false;
     }
 
     // TODO check if sb is in the way
-    switch(table->blocks[x1][y1].PIECE_TYPE) {
+    switch(table->blocks[coord_start.x][coord_start.y].PIECE_TYPE) {
 	    case KING:
             // TODO check if wont be in hit
-            return((abs(x1-x2) == 0 || abs(x1-x2) == 0) && (abs(y1-y2) == 0 || abs(y1-y2) == 1));
+            return((abs(coord_start.x-coord_final.x) == 0 || abs(coord_start.x-coord_final.x) == 0) && (abs(coord_start.y-coord_final.y) == 0 || abs(coord_start.y-coord_final.y) == 1));
         case QUEEN:
-            return abs(x1-x2) == abs(y1-y2) || abs(x1-x2) == 0 || abs(y1-y2) == 0;
+            return abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y) || abs(coord_start.x-coord_final.x) == 0 || abs(coord_start.y-coord_final.y) == 0;
         case ROOK:
-            return abs(x1-x2) == 0 || abs(y1-y2) == 0;
+            return abs(coord_start.x-coord_final.x) == 0 || abs(coord_start.y-coord_final.y) == 0;
         case BISHOP:
-             return abs(x1-x2) == abs(y1-y2); 
+             return abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y); 
             break;
         case KNIGHT:
-            return (abs(x1-x2) == 2 && abs(y1-y2) == 1) || (abs(x1-x2) == 1 && abs(y1-y2) == 2);
+            return (abs(coord_start.x-coord_final.x) == 2 && abs(coord_start.y-coord_final.y) == 1) || (abs(coord_start.x-coord_final.x) == 1 && abs(coord_start.y-coord_final.y) == 2);
         case PAWN:
-            return (abs(x1-x2) == 1 && table->blocks[x2][y2].PIECE_TYPE == TYPE_NONE) || (abs(x1-x2) == abs(y1-y2) == 1 && table->blocks[x2][y2].PIECE_TYPE != TYPE_NONE);            
+            return (abs(coord_start.x-coord_final.x) == 1 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE == TYPE_NONE) || (abs(coord_start.x-coord_final.x) == abs(coord_start.y-coord_final.y) == 1 && table->blocks[coord_final.x][coord_final.y].PIECE_TYPE != TYPE_NONE);            
         case TYPE_NONE:
             exit(ERROR_INVALID_PIECE_TYPE);
             break;
@@ -97,19 +101,21 @@ bool is_valid_move(table* table, int x1, int y1, int x2, int y2) {
     return false;
 }
 
-table* move(table* table, int x1, int y1, int x2, int y2) {
-    piece current_piece = table->blocks[x1][y1];
+table* move(table* table, coordinate coord_start, coordinate coord_final) {
+    piece current_piece = table->blocks[coord_start.x][coord_start.y];
 
     if(current_piece.COLOR == COLOR_NONE) {
         exit(ERROR_INVALID_STEP);
     } 
 
 
-    if(is_valid_move(table, x1, y1, x2, y2)) {
-        table->blocks[x2][y1] = table->blocks[x1][y1];
-        table->blocks[x1][y1].COLOR = COLOR_NONE;
-        table->blocks[x1][y1].PIECE_TYPE = TYPE_NONE;
+    if(is_valid_move(table, coord_start, coord_final)) {
+        table->blocks[coord_final.x][coord_start.y] = table->blocks[coord_start.x][coord_start.y];
+        table->blocks[coord_start.x][coord_start.y].COLOR = COLOR_NONE;
+        table->blocks[coord_start.x][coord_start.y].PIECE_TYPE = TYPE_NONE;
     }
 
     return table;
 }
+
+
